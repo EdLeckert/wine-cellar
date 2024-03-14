@@ -1,0 +1,9 @@
+refresh_inventory:
+  target:
+    entity:
+      integration: wine_cellar
+get_inventory:
+  target:
+    entity:
+      integration: wine_cellar
+    
