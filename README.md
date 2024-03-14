@@ -1,2 +1,2 @@
 # wine-cellar
-Home Assistant wine inventory integration with cellartracker
+Home Assistant wine inventory integration with cellartracker.COM
