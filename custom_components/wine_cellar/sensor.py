@@ -1,4 +1,5 @@
 """The Home Assistant Wine Cellar integration."""
+import pandas as pd
 import logging
 from typing import Callable
 
@@ -90,13 +91,13 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         """The unit of measurement that the sensor's value is expressed in."""
         return "bottles"
 
-    # @property
-    # def extra_state_attributes(self):
-    #     attributes = { "inventory": "None" }
-    #     _LOGGER.debug("extra_state_attributes")
-    #     if self.coordinator.data is not None:
-    #         attributes["inventory"] = self._inventory_list()
-    #     return attributes
+    @property
+    def extra_state_attributes(self):
+        attributes = { "summary": "None" }
+        _LOGGER.debug("extra_state_attributes")
+        if self.coordinator.data is not None:
+            attributes = self._inventory_summary()
+        return attributes
 
     @callback
     def _handle_coordinator_update(self):
@@ -105,23 +106,33 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         self._attr_native_value = len(self.coordinator.data)
         return super()._handle_coordinator_update()
 
-    def _inventory_list(self) -> list[dict]:
+    def _inventory_summary(self) -> dict:
         """Build a list of dict objects for each bottle in inventory."""
-        inventory = []
-        for bottle in self.coordinator.data:
-            wine = {}
-            wine["Barcode"] = bottle["Barcode"]
-            wine["Vintage"] = bottle["Vintage"]
-            wine["Wine"] = bottle["Wine"]
-            wine["Price"] = bottle["Price"]
-            wine["StoreName"] = bottle["StoreName"]
-            wine["Category"] = bottle["Category"]
-            wine["Color"] = bottle["Color"]
-            wine["BeginConsume"] = bottle["BeginConsume"]
-            wine["EndConsume"] = bottle["EndConsume"]
-            wine["Bin"] = bottle["Bin"]
-            inventory.append(wine)
-        return inventory
+        data = {}
+        df = pd.DataFrame(self.coordinator.data)
+        df[["Price","Valuation"]] = df[["Price","Valuation"]].apply(pd.to_numeric)
+
+        groups = ['Varietal', 'Country', 'Vintage', 'Producer', 'Type', 'Location']
+
+        for group in groups:
+            group_data = df.groupby(group).agg({'iWine':'count','Valuation':['sum','mean']})
+            group_data.columns = group_data.columns.droplevel(0)
+            group_data["%"] = 1
+            group_data["%"] = (group_data['count']/group_data['count'].sum() ) * 100
+            group_data.columns = ["count", "value_total", "value_avg", "%"]
+            data[group] = {}
+            for row, item in group_data.iterrows():
+                if row == "1001":
+                    row = "NV"
+                data[group][row] = item.to_dict()
+                data[group][row]["sub_type"] = row
+
+
+
+        data["total_bottles"] = len(df)
+        data["total_value"] = df['Valuation'].sum()
+        data["average_value"] = df['Valuation'].mean()
+        return data
 
     async def _get_inventory(self):
         _LOGGER.debug("_get_inventory")
