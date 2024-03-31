@@ -1,4 +1,4 @@
-refresh_inventory:
+get_countries:
   target:
     entity:
       integration: wine_cellar
@@ -6,4 +6,7 @@ get_inventory:
   target:
     entity:
       integration: wine_cellar
-    
+refresh_inventory:
+  target:
+    entity:
+      integration: wine_cellar

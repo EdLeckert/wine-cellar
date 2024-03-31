@@ -1,4 +1,5 @@
 """The Home Assistant Wine Cellar integration."""
+import pandas as pd
 import logging
 from typing import Callable
 
@@ -12,8 +13,10 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
     DOMAIN,
+    SCHEMA_SERVICE_GET_COUNTRIES,
     SCHEMA_SERVICE_GET_INVENTORY,
     SCHEMA_SERVICE_REFRESH_INVENTORY,
+    SERVICE_GET_COUNTRIES,
     SERVICE_GET_INVENTORY,
     SERVICE_REFRESH_INVENTORY,
 )
@@ -33,6 +36,13 @@ async def async_setup_entry(
     platform = entity_platform.async_get_current_platform()
     _LOGGER.debug(f"platform_name: {platform.platform_name}")
 
+    # This will call Entity._get_countries
+    platform.async_register_entity_service(
+        SERVICE_GET_COUNTRIES,
+        SCHEMA_SERVICE_GET_COUNTRIES,
+        "_get_countries",
+        supports_response=SupportsResponse.ONLY,
+    )
     # This will call Entity._get_inventory
     platform.async_register_entity_service(
         SERVICE_GET_INVENTORY,
@@ -90,13 +100,13 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         """The unit of measurement that the sensor's value is expressed in."""
         return "bottles"
 
-    # @property
-    # def extra_state_attributes(self):
-    #     attributes = { "inventory": "None" }
-    #     _LOGGER.debug("extra_state_attributes")
-    #     if self.coordinator.data is not None:
-    #         attributes["inventory"] = self._inventory_list()
-    #     return attributes
+    @property
+    def extra_state_attributes(self):
+        attributes = { "summary": "None" }
+        _LOGGER.debug("extra_state_attributes")
+        if self.coordinator.data is not None:
+            attributes["summary"] = self._inventory_summary()
+        return attributes
 
     @callback
     def _handle_coordinator_update(self):
@@ -104,6 +114,20 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         _LOGGER.debug("_handle_coordinator_update")
         self._attr_native_value = len(self.coordinator.data)
         return super()._handle_coordinator_update()
+
+    def _inventory_summary(self) -> list[dict]:
+        """Build a list of dict objects for summary of inventory."""
+        summary = []
+        data = {}
+        df = pd.DataFrame(self.coordinator.data)
+        df[["Price","Valuation"]] = df[["Price","Valuation"]].apply(pd.to_numeric).round(0)
+        
+        data["total_bottles"] = len(df)
+        data["total_value"] = "$" + str(int(df['Valuation'].sum().round(0)))
+        data["average_value"] = "$" + str(int(df['Valuation'].mean().round(0)))
+
+        summary.append(data)
+        return summary
 
     def _inventory_list(self) -> list[dict]:
         """Build a list of dict objects for each bottle in inventory."""
@@ -129,7 +153,33 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
        # Update the data
         await self.coordinator.async_request_refresh()
         return { "inventory": self._inventory_list() }
+
+    def _inventory_country_summary(self) -> list[dict]:
+        """Build a list of dict objects for summary of inventory by country."""
+        summary = []
+        df = pd.DataFrame(self.coordinator.data)
+        df[["Price","Valuation"]] = df[["Price","Valuation"]].apply(pd.to_numeric).round(0)
         
+        group = "Country"
+        group_data = df.groupby(group).agg({'iWine':'count','Valuation':['sum','mean']})
+        group_data.columns = group_data.columns.droplevel(0)
+        group_data["%"] = 1
+        group_data["%"] = (group_data['count']/group_data['count'].sum() ) * 100
+        group_data.columns = ["count", "value_total", "value_avg", "%"]
+        data = {}
+        for row, item in group_data.iterrows():
+          if row == "1001":
+            row = "NV"
+          data[row] = item.to_dict()
+
+        summary.append(data)
+        return summary
+
+    async def _get_countries(self):
+        _LOGGER.debug("get_countries")
+
+        return { "countries": self._inventory_country_summary() }
+
     async def _refresh_inventory(self):
         _LOGGER.debug("_refresh_inventory")
 

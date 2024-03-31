@@ -5,8 +5,15 @@ from homeassistant.helpers import config_validation as cv
 
 DOMAIN = "wine_cellar"
 
+SCHEMA_SERVICE_GET_COUNTRIES = {}
 SCHEMA_SERVICE_GET_INVENTORY = {}
 SCHEMA_SERVICE_REFRESH_INVENTORY = {}
 
+SERVICE_GET_COUNTRIES = "get_countries"
 SERVICE_GET_INVENTORY = "get_inventory"
+SERVICE_GET_LOCATIONS = "get_locations"
+SERVICE_GET_PRODUCERS = "get_producers"
+SERVICE_GET_TYPES = "get_types"
+SERVICE_GET_VARIETALS = "get_varietals"
+SERVICE_GET_VINTAGES = "get_vintages"
 SERVICE_REFRESH_INVENTORY = "refresh_inventory"
