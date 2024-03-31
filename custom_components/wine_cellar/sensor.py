@@ -16,9 +16,19 @@ from .const import (
     DOMAIN,
     SCHEMA_SERVICE_GET_COUNTRIES,
     SCHEMA_SERVICE_GET_INVENTORY,
+    SCHEMA_SERVICE_GET_LOCATIONS,
+    SCHEMA_SERVICE_GET_PRODUCERS,
+    SCHEMA_SERVICE_GET_TYPES,
+    SCHEMA_SERVICE_GET_VARIETALS,
+    SCHEMA_SERVICE_GET_VINTAGES,
     SCHEMA_SERVICE_REFRESH_INVENTORY,
     SERVICE_GET_COUNTRIES,
     SERVICE_GET_INVENTORY,
+    SERVICE_GET_LOCATIONS,
+    SERVICE_GET_PRODUCERS,
+    SERVICE_GET_TYPES,
+    SERVICE_GET_VARIETALS,
+    SERVICE_GET_VINTAGES,
     SERVICE_REFRESH_INVENTORY,
 )
 
@@ -44,11 +54,52 @@ async def async_setup_entry(
         "_get_countries",
         supports_response=SupportsResponse.ONLY,
     )
+
     # This will call Entity._get_inventory
     platform.async_register_entity_service(
         SERVICE_GET_INVENTORY,
         SCHEMA_SERVICE_GET_INVENTORY,
         "_get_inventory",
+        supports_response=SupportsResponse.ONLY,
+    )
+
+    # This will call Entity._get_locations
+    platform.async_register_entity_service(
+        SERVICE_GET_LOCATIONS,
+        SCHEMA_SERVICE_GET_LOCATIONS,
+        "_get_locations",
+        supports_response=SupportsResponse.ONLY,
+    )
+
+    # This will call Entity._get_producers
+    platform.async_register_entity_service(
+        SERVICE_GET_PRODUCERS,
+        SCHEMA_SERVICE_GET_PRODUCERS,
+        "_get_producers",
+        supports_response=SupportsResponse.ONLY,
+    )
+
+    # This will call Entity._get_types
+    platform.async_register_entity_service(
+        SERVICE_GET_TYPES,
+        SCHEMA_SERVICE_GET_TYPES,
+        "_get_types",
+        supports_response=SupportsResponse.ONLY,
+    )
+
+    # This will call Entity._get_varietals
+    platform.async_register_entity_service(
+        SERVICE_GET_VARIETALS,
+        SCHEMA_SERVICE_GET_VARIETALS,
+        "_get_varietals",
+        supports_response=SupportsResponse.ONLY,
+    )
+
+    # This will call Entity._get_vintages
+    platform.async_register_entity_service(
+        SERVICE_GET_VINTAGES,
+        SCHEMA_SERVICE_GET_VINTAGES,
+        "_get_vintages",
         supports_response=SupportsResponse.ONLY,
     )
 
@@ -104,7 +155,6 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
     @property
     def extra_state_attributes(self):
         attributes = { "summary": "None" }
-        _LOGGER.debug("extra_state_attributes")
         if self.coordinator.data is not None:
             attributes["summary"] = self._inventory_summary()
         return attributes
@@ -148,26 +198,18 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
             inventory.append(wine)
         return inventory
 
-    async def _get_inventory(self):
-        _LOGGER.debug("_get_inventory")
-
-       # Update the data
-        await self.coordinator.async_request_refresh()
-        return { "inventory": self._inventory_list() }
-
-    def _inventory_country_summary(self) -> list[dict]:
+    def _inventory_group_summary(self, group) -> list[dict]:
         """Build a list of dict objects for summary of inventory by country."""
         summary = []
         df = pd.DataFrame(self.coordinator.data)
         df[["Price","Valuation"]] = df[["Price","Valuation"]].apply(pd.to_numeric).round(0)
         
-        group = "Country"
         group_data = df.groupby(group).agg({'iWine':'count','Valuation':['sum','mean']})
         group_data.columns = group_data.columns.droplevel(0)
         group_data["mean"] = group_data["mean"].round(0)
-        group_data["%"] = 1
-        group_data["%"] = ((group_data['count']/group_data['count'].sum() ) * 100).round(0)
-        group_data.columns = ["count", "value_total", "value_avg", "%"]
+        group_data["percent"] = 1
+        group_data["percent"] = ((group_data['count']/group_data['count'].sum() ) * 100).round(0)
+        group_data.columns = ["count", "value_total", "value_avg", "percent"]
         data = {}
         for row, item in group_data.iterrows():
           data[row] = item.to_dict()
@@ -175,7 +217,7 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         keysList = list(data.keys())
         valuesList = list(data.values())
         for index, element in enumerate(keysList):
-            the_dict = {'Country': element}
+            the_dict = {group: element}
             for key in valuesList[index]:
                 the_dict[key] = valuesList[index][key]
             summary.append(the_dict)
@@ -183,9 +225,27 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         return summary
 
     async def _get_countries(self):
-        _LOGGER.debug("get_countries")
+        return { "countries": self._inventory_group_summary("Country") }
 
-        return { "countries": self._inventory_country_summary() }
+    async def _get_inventory(self):
+       # Update the data
+        await self.coordinator.async_request_refresh()
+        return { "inventory": self._inventory_list() }
+
+    async def _get_locations(self):
+        return { "locations": self._inventory_group_summary("Location") }
+
+    async def _get_producers(self):
+        return { "producers": self._inventory_group_summary("Producer") }
+
+    async def _get_types(self):
+        return { "types": self._inventory_group_summary("Type") }
+
+    async def _get_varietals(self):
+        return { "varietals": self._inventory_group_summary("Varietal") }
+
+    async def _get_vintages(self):
+        return { "vintages": self._inventory_group_summary("Vintage") }
 
     async def _refresh_inventory(self):
         _LOGGER.debug("_refresh_inventory")
