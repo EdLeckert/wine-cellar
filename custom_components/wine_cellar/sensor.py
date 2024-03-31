@@ -1,4 +1,5 @@
 """The Home Assistant Wine Cellar integration."""
+import enum
 import pandas as pd
 import logging
 from typing import Callable
@@ -163,16 +164,22 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         group = "Country"
         group_data = df.groupby(group).agg({'iWine':'count','Valuation':['sum','mean']})
         group_data.columns = group_data.columns.droplevel(0)
+        group_data["mean"] = group_data["mean"].round(0)
         group_data["%"] = 1
-        group_data["%"] = (group_data['count']/group_data['count'].sum() ) * 100
+        group_data["%"] = ((group_data['count']/group_data['count'].sum() ) * 100).round(0)
         group_data.columns = ["count", "value_total", "value_avg", "%"]
         data = {}
         for row, item in group_data.iterrows():
-          if row == "1001":
-            row = "NV"
           data[row] = item.to_dict()
 
-        summary.append(data)
+        keysList = list(data.keys())
+        valuesList = list(data.values())
+        for index, element in enumerate(keysList):
+            the_dict = {'Country': element}
+            for key in valuesList[index]:
+                the_dict[key] = valuesList[index][key]
+            summary.append(the_dict)
+
         return summary
 
     async def _get_countries(self):
