@@ -1,0 +1,23 @@
+{
+  "title": "Wine Cellar",
+  "config": {
+    "title": "Connect to the Cellar Tracker Server",
+    "step": {
+      "user": {
+        "title": "cellartracker.com Credentials",
+        "data": {
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect",
+      "invalid_auth": "Invalid authentication",
+      "unknown": "Unexpected error"
+    },
+    "abort": {
+      "already_configured": "Device is already configured"
+    }
+  }
+}

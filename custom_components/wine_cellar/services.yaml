@@ -1,0 +1,32 @@
+get_countries:
+  target:
+    entity:
+      integration: wine_cellar
+get_inventory:
+  target:
+    entity:
+      integration: wine_cellar
+get_locations:
+  target:
+    entity:
+      integration: wine_cellar
+get_producers:
+  target:
+    entity:
+      integration: wine_cellar
+get_types:
+  target:
+    entity:
+      integration: wine_cellar
+get_varietals:
+  target:
+    entity:
+      integration: wine_cellar
+get_vintages:
+  target:
+    entity:
+      integration: wine_cellar
+refresh_inventory:
+  target:
+    entity:
+      integration: wine_cellar
