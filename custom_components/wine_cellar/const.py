@@ -4,6 +4,7 @@ import voluptuous as vol
 from homeassistant.helpers import config_validation as cv
 
 DOMAIN = "wine_cellar"
+POLL_SECONDS = 3600
 
 SCHEMA_SERVICE_GET_COUNTRIES = {}
 SCHEMA_SERVICE_GET_INVENTORY = {}

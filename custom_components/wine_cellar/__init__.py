@@ -23,7 +23,7 @@ from homeassistant.helpers.entity_platform import async_get_platforms
 from cellartracker import cellartracker
 from cellartracker.errors import AuthenticationError, CannotConnect
 
-from .const import DOMAIN
+from .const import DOMAIN, POLL_SECONDS
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -70,7 +70,7 @@ class MyCoordinator(DataUpdateCoordinator):
             _LOGGER,
             name="CellarTracker",
             # Polling interval. Will only be polled if there are subscribers.
-            update_interval=timedelta(seconds=3600),
+            update_interval=timedelta(seconds=POLL_SECONDS),
         )
         self._hass = hass
         self._controller = controller

@@ -45,7 +45,6 @@ async def async_setup_entry(
     async_add_entities(entities)
 
     platform = entity_platform.async_get_current_platform()
-    _LOGGER.debug(f"platform_name: {platform.platform_name}")
 
     # This will call Entity._get_countries
     platform.async_register_entity_service(
@@ -162,7 +161,6 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
     @callback
     def _handle_coordinator_update(self):
         """Handle updated data from the coordinator."""
-        _LOGGER.debug("_handle_coordinator_update")
         self._attr_native_value = len(self.coordinator.data)
         return super()._handle_coordinator_update()
 
@@ -174,8 +172,8 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         df[["Price","Valuation"]] = df[["Price","Valuation"]].apply(pd.to_numeric).round(0)
         
         data["total_bottles"] = len(df)
-        data["total_value"] = "$" + str(int(df['Valuation'].sum().round(0)))
-        data["average_value"] = "$" + str(int(df['Valuation'].mean().round(0)))
+        data["total_value"] = int(df['Valuation'].sum().round(0))
+        data["average_value"] = int(df['Valuation'].mean().round(0))
 
         summary.append(data)
         return summary
@@ -229,7 +227,6 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
 
     async def _get_inventory(self):
        # Update the data
-        await self.coordinator.async_request_refresh()
         return { "inventory": self._inventory_list() }
 
     async def _get_locations(self):
@@ -248,7 +245,6 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         return { "vintages": self._inventory_group_summary("Vintage") }
 
     async def _refresh_inventory(self):
-        _LOGGER.debug("_refresh_inventory")
 
        # Update the data
         await self.coordinator.async_request_refresh()
