@@ -55,5 +55,7 @@ This Tile Card provides the total bottle count, a link to a view with more infor
 
 More detailed views of the inventory are best presented with the [flex-table-card](https://github.com/custom-cards/flex-table-card). The `flex-table-card` shows data in a tabular form, which works well for a wine database.
 
+<img src="/img/WineInventory.png" alt="Wine Inventory List" width="100%">
+
 ## Contribute
 Feel free to contribute by opening a PR or issue on this project.
