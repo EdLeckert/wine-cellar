@@ -14,10 +14,10 @@ The `wine-cellar` implementation allows you to integrate your [Cellar Tracker](h
 - Sensor entity (per account) provides total bottle count.
 - Service provides detailed inventory.
 - Services provide summaries of inventory.
-- Service immediately refresh inventory from Cellar Tracker.
+- Service immediately refreshes inventory from Cellar Tracker.
 
 ## Disclaimer
-This is an unofficial integration of Cellar Tracker for Home Assistant. The developer and the contributors are not, in any way, affiliated with CellarTracker! LLC.
+This is an unofficial integration of Cellar Tracker for Home Assistant. The developer and the contributors are not in any way affiliated with CellarTracker! LLC.
 
 "CellarTracker!" is a trademark of CellarTracker! LLC
 
