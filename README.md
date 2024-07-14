@@ -29,7 +29,7 @@ This is an unofficial integration of Cellar Tracker for Home Assistant. The deve
 1. Install manually by copying the `custom_components/wine_cellar` folder into `<config_dir>/custom_components`.
 2. Restart Home Assistant.
 3. In the Home Assistant UI, navigate to `Settings` then `Devices & services`. In the `Integrations` tab, click on the `ADD INTEGRATION` button at the bottom right and select `Wine Cellar`. Fill out the options and save.
-   - Username - Your cellartracker.com Member Name (NOT your Email Address).
+   - Member Name - Your cellartracker.com Member Name (NOT your Email Address).
    - Password - Your cellartracker.com password.
 ## Usage
 
