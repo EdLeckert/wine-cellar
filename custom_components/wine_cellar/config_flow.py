@@ -38,7 +38,7 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     await hass.async_add_executor_job(client.get_food_tag)
 
     # Return info that you want to store in the config entry.
-    return {"title": "Wine Cellar"}
+    return {"title": "Wine Cellar of " + data[CONF_USERNAME]}
 
 
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
