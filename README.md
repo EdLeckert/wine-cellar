@@ -259,7 +259,7 @@ columns:
 ```
 
 When using the other Summary Services, you will need to change some of the `name`, `data`, and `modify` values, as well as any `title`, `sort_by`, 
-or other relevant values. That is, every occurrence of `Country` and `countries` would need to be substituted using the table above.
+or other relevant values. That is, every occurrence of `Country` and `countries` in the above example would need to be substituted using the table above.
 
 Here are examples of each service:
 
