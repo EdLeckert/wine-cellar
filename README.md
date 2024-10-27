@@ -42,7 +42,7 @@ This Tile Card provides the total bottle count, a link to a view with more infor
 
 ```
 - type: tile
-  entity: sensor.membername_wine_inventory
+  entity: sensor.<yourmembername>_wine_inventory
   name: Wine Inventory
   tap_action:
     action: navigate
@@ -51,7 +51,7 @@ This Tile Card provides the total bottle count, a link to a view with more infor
     action: call-service
     service: wine_cellar.refresh_inventory
     target:
-      entity_id: sensor.membername_wine_inventory
+      entity_id: sensor.<yourmembername>_wine_inventory
 ```
 
 ### Inventory List Service
@@ -67,7 +67,7 @@ The card definition for the above view demonstrates some advanced features of th
 - type: custom:flex-table-card
   service: wine_cellar.get_inventory
   entities:
-    include: sensor.membername_wine_inventory
+    include: sensor.<yourmembername>_wine_inventory
   clickable: true
   sort_by:
     - ConsumeBy
@@ -171,18 +171,68 @@ A group of services is available to summarize the inventory by various fields. T
 - wine_cellar.get_varietals
 - wine_cellar.get_vintages
 
-Some examples of their use:
+Each service returns a list that includes the following attributes:
 
-<img src="/img/WineInventorySummary.png" alt="Wine Inventory Summaries" width="100%">
+- group title
+- count
+- value_total
+- value_avg
+- percent
 
-The card for the summary by Country:
+You can preview the data that will be provided to the `flex-table-card` for each service by using the `Developer tools` `Actions` tab.
+
+For example, the following action call...
+
+```
+action: wine_cellar.get_countries
+target:
+  entity_id: sensor.<yourmembername>_wine_inventory
+data: {}
+```
+
+...produces a result like:
+
+
+```
+sensor.<yourmembername>_wine_inventory:
+  countries:
+    - Country: Australia
+      count: 1
+      value_total: 25
+      value_avg: 25
+      percent: 2
+    - Country: France
+      count: 2
+      value_total: 72
+      value_avg: 36
+      percent: 5
+    - Country: Italy
+      count: 1
+      value_total: 29
+      value_avg: 29
+      percent: 2
+      ...
+```
+
+The keys that are returned with each service are as follows:
+
+| Service          | Top level | Group title
+| -------          | --------- | -----------
+| `get_countries`  | countries | Country
+| `get_locations`  | locations | Location
+| `get_producers`  | producers | Producer
+| `get_types`      | types     | Type
+| `get_varietals`  | varietals | Varietal
+| `get_vintages`   | vintages  | Vintage
+
+This is the card for the summary by Country shown in the following examples:
 
 ```
 type: custom:flex-table-card
 title: Bottles per Country
 service: wine_cellar.get_countries
 entities:
-  include: sensor.membername_wine_inventory
+  include: sensor.<yourmembername>_wine_inventory
 sort_by: Country-
 columns:
   - name: Country
@@ -207,6 +257,13 @@ columns:
     modify: x.count
     align: right
 ```
+
+When using the other Summary Services, you will need to change some of the `name`, `data`, and `modify` values, as well as any `title`, `sort_by`, 
+or other relevant values. That is, every occurrence of `Country` and `countries` in the above example would need to be substituted using the table above.
+
+Here are examples of each service:
+
+<img src="/img/WineInventorySummary.png" alt="Wine Inventory Summaries" width="100%">
 
 ## Contribute
 Feel free to contribute by opening a PR or issue on this project.
