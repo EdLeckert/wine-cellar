@@ -64,100 +64,94 @@ Consider this list of wines as shown in a `flex-table-card`:
 The card definition for the above view demonstrates some advanced features of the card which can be used to mimic CellarTracker's display of icons. Notice the use of the `action` option to populate the table using the `wine_cellar.get_inventory` action.
 
 ```
-- type: custom:flex-table-card
-  action: wine_cellar.get_inventory
-  entities:
-    include: sensor.<yourmembername>_wine_inventory
-  clickable: true
-  sort_by:
-    - ConsumeBy
-    - Vintage
-  columns:
-    - name: ''
-      data: inventory
-      align: center
-      modify: |-
-        function getColor(wineColor) {
-          let color="red";
-          switch(wineColor) {
-              case "Red":
-                color="DarkRed"
-                break;
-              case "White":
-                color="Khaki"
-                break;
-              case "Rosé":
-                color="LightPink"
-                break;
-              default:
-                color="White";
-                break;
-          }
-          return color;
-        }  function getIcon(wineType) {
-          let icon="mdi:glass-wine";
-          switch(wineType) {
-              case "Dry":
-                icon="mdi:glass-wine"
-                break;
-              case "Sweet/Dessert":
-                icon="mdi:glass-tulip"
-                break;
-              case "Sparkling":
-                icon="mdi:glass-flute"
-                break;
-              default:
-                icon="mdi:glass-wine"
-                break;
-          }
-          return icon;
-        } '<ha-icon icon=' + getIcon(x.Category) + ' style=color:' +
-        getColor(x.Color) + ';></ha-icon>'
-    - name: Barcode
-      data: inventory
-      modify: x.Barcode
-      hidden: true
-    - name: Vintage
-      data: inventory
-      modify: if(parseInt(x.Vintage) == 1001) {"N.V."} else{parseInt(x.Vintage)}
-    - name: Wine
-      data: inventory
-      modify: x.Wine
-    - name: ConsumeBy
-      data: inventory
-      modify: |-
-        ((parseInt(x.BeginConsume) || 9999) +
-         (parseInt(x.EndConsume) || 9999)) / 2
-      hidden: true
-    - name: Category
-      data: inventory
-      modify: x.Category + " " + x.Color
-    - name: Consume
-      data: inventory
-      modify: |-
-        let result = 
-          x.BeginConsume == "" && x.EndConsume == "" 
-          ? "None"
-          : x.BeginConsume + "-" + x.EndConsume;
-          parseInt(x.BeginConsume) > new Date().getFullYear()
-            ? '<div class="too-early">' + result + '</div>'
-            : parseInt(x.EndConsume) < new Date().getFullYear()
-              ?'<div class="too-late">' + result + '</div>'
-              : result
-    - name: Bin
-      data: inventory
-      modify: x.Bin
-    - name: Price
-      data: inventory
-      modify: >-
-        if (x.Price == 0 ) {"N/A"} else {"$" +
-        parseFloat(x.Price).toFixed(0)}
-    - name: Store
-      data: inventory
-      modify: x.StoreName
-  css:
-    tr:has(> td div.too-early): color:dimgray !important;
-    tr:has(> td div.too-late): color:red !important;
+type: custom:flex-table-card
+action: wine_cellar.get_inventory
+entities:
+  include: sensor.<yourmembername>_wine_inventory
+clickable: true
+sort_by:
+  - ConsumeBy
+  - Vintage
+columns:
+  - name: ""
+    data: inventory
+    align: center
+    modify: |-
+      function getColor(wineColor) {
+        let color="red";
+        switch(wineColor) {
+            case "Red":
+              color="DarkRed"
+              break;
+            case "White":
+              color="Khaki"
+              break;
+            case "Rosé":
+              color="LightPink"
+              break;
+            default:
+              color="White";
+              break;
+        }
+        return color;
+      }  function getIcon(wineType) {
+        let icon="mdi:glass-wine";
+        switch(wineType) {
+            case "Dry":
+              icon="mdi:glass-wine"
+              break;
+            case "Sweet/Dessert":
+              icon="mdi:glass-tulip"
+              break;
+            case "Sparkling":
+              icon="mdi:glass-flute"
+              break;
+            default:
+              icon="mdi:glass-wine"
+              break;
+        }
+        return icon;
+      } '<ha-icon icon=' + getIcon(x.Category) + ' style=color:' +
+      getColor(x.Color) + ';></ha-icon>'
+  - name: Barcode
+    data: inventory.Barcode
+    hidden: true
+  - name: Vintage
+    data: inventory.Vintage
+    modify: if(parseInt(x) == 1001) {"N.V."} else{parseInt(x)}
+  - name: Wine
+    data: inventory.Wine
+  - name: ConsumeBy
+    data: inventory
+    modify: |-
+      ((parseInt(x.BeginConsume) || 9999) +
+       (parseInt(x.EndConsume) || 9999)) / 2
+    hidden: true
+  - name: Category
+    data: inventory
+    modify: x.Category + " " + x.Color
+  - name: Consume
+    data: inventory
+    modify: |-
+      let result = 
+        x.BeginConsume == "" && x.EndConsume == "" 
+        ? "None"
+        : x.BeginConsume + "-" + x.EndConsume;
+        parseInt(x.BeginConsume) > new Date().getFullYear()
+          ? '<div class="too-early">' + result + '</div>'
+          : parseInt(x.EndConsume) < new Date().getFullYear()
+            ?'<div class="too-late">' + result + '</div>'
+            : result
+  - name: Bin
+    data: inventory.Bin
+  - name: Price
+    data: inventory.Price
+    modify: if (x == 0 ) {"N/A"} else {"$" + parseFloat(x).toFixed(0)}
+  - name: Store
+    data: inventory.StoreName
+css:
+  tr:has(> td div.too-early): color:dimgray !important;
+  tr:has(> td div.too-late): color:red !important;
 ```
 
 ### Inventory Summary Actions
