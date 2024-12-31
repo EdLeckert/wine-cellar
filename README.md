@@ -12,9 +12,9 @@ The `wine-cellar` implementation allows you to integrate your [Cellar Tracker](h
 ## Features
 
 - Sensor entity (per account) provides total bottle count.
-- Service provides detailed inventory.
-- Services provide summaries of inventory.
-- Service immediately refreshes inventory from Cellar Tracker.
+- Action provides detailed inventory.
+- Actions provide summaries of inventory.
+- Action immediately refreshes inventory from Cellar Tracker.
 
 ## Disclaimer
 This is an unofficial integration of Cellar Tracker for Home Assistant. The developer and the contributors are not in any way affiliated with CellarTracker! LLC.
@@ -54,18 +54,18 @@ This Tile Card provides the total bottle count, a link to a view with more infor
       entity_id: sensor.<yourmembername>_wine_inventory
 ```
 
-### Inventory List Service
+### Inventory List Action
 More detailed views of the inventory are best presented with the [flex-table-card](https://github.com/custom-cards/flex-table-card). The `flex-table-card` shows data in a tabular form, which works well for a wine database.
 
 Consider this list of wines as shown in a `flex-table-card`:
 
 <img src="/img/WineInventoryList.png" alt="Wine Inventory List" width="100%">
 
-The card definition for the above view demonstrates some advanced features of the card which can be used to mimic CellarTracker's display of icons. Notice the use of the `service` option to populate the table using the `wine_cellar.get_inventory` service.
+The card definition for the above view demonstrates some advanced features of the card which can be used to mimic CellarTracker's display of icons. Notice the use of the `action` option to populate the table using the `wine_cellar.get_inventory` action.
 
 ```
 - type: custom:flex-table-card
-  service: wine_cellar.get_inventory
+  action: wine_cellar.get_inventory
   entities:
     include: sensor.<yourmembername>_wine_inventory
   clickable: true
@@ -160,9 +160,9 @@ The card definition for the above view demonstrates some advanced features of th
     tr:has(> td div.too-late): color:red !important;
 ```
 
-### Inventory Summary Services
+### Inventory Summary Actions
 
-A group of services is available to summarize the inventory by various fields. They are:
+A group of actions is available to summarize the inventory by various fields. They are:
 
 - wine_cellar.get_countries
 - wine_cellar.get_locations
@@ -171,7 +171,7 @@ A group of services is available to summarize the inventory by various fields. T
 - wine_cellar.get_varietals
 - wine_cellar.get_vintages
 
-Each service returns a list that includes the following attributes:
+Each action returns a list that includes the following attributes:
 
 - group title
 - count
@@ -179,7 +179,7 @@ Each service returns a list that includes the following attributes:
 - value_avg
 - percent
 
-You can preview the data that will be provided to the `flex-table-card` for each service by using the `Developer tools` `Actions` tab.
+You can preview the data that will be provided to the `flex-table-card` for each action by using the `Developer tools` `Actions` tab.
 
 For example, the following action call...
 
@@ -214,9 +214,9 @@ sensor.<yourmembername>_wine_inventory:
       ...
 ```
 
-The keys that are returned with each service are as follows:
+The keys that are returned with each action are as follows:
 
-| Service          | Top level | Group title
+| Action          | Top level | Group title
 | -------          | --------- | -----------
 | `get_countries`  | countries | Country
 | `get_locations`  | locations | Location
@@ -230,38 +230,33 @@ This is the card for the summary by Country shown in the following examples:
 ```
 type: custom:flex-table-card
 title: Bottles per Country
-service: wine_cellar.get_countries
+action: wine_cellar.get_countries
 entities:
   include: sensor.<yourmembername>_wine_inventory
 sort_by: Country-
 columns:
   - name: Country
-    data: countries
-    modify: x.Country
+    data: countries.Country
   - name: Percentage
-    data: countries
-    modify: x.percent
+    data: countries.percent
     align: right
   - name: Total Cost
-    data: countries
-    modify: x.value_total
+    data: countries.value_total
     align: right
     prefix: $
   - name: Average Price
-    data: countries
-    modify: x.value_avg
+    data: countries.value_avg
     align: right
     prefix: $
   - name: Bottles
-    data: countries
-    modify: x.count
+    data: countries.count
     align: right
 ```
 
-When using the other Summary Services, you will need to change some of the `name`, `data`, and `modify` values, as well as any `title`, `sort_by`, 
+When using the other Summary Actions, you will need to change some of the `name` and `data` values, as well as any `title`, `sort_by`, `modify`,
 or other relevant values. That is, every occurrence of `Country` and `countries` in the above example would need to be substituted using the table above.
 
-Here are examples of each service:
+Here are examples of each action:
 
 <img src="/img/WineInventorySummary.png" alt="Wine Inventory Summaries" width="100%">
 
