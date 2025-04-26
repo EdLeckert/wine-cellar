@@ -338,11 +338,11 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         for i in idList:
             counts[i] = counts.get(i, 0) + 1
 
-        # Get values identical over all bottles of a wine and add bottle Count value
+        # Get values identical over all bottles of a wine and add bottle count value
         for key, value in counts.items():
             element = find_first_matching_element(self.coordinator.data, groupby, key)
             distinct_values = self._get_distinct_values(element)
-            distinct_values['Count'] = value
+            distinct_values['Quantity'] = value
             wineList.append(distinct_values)
 
         return wineList
