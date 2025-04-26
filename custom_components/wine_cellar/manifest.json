@@ -11,6 +11,6 @@
   "iot_class": "cloud_polling",
   "requirements": [ "cellartracker==1.1.1" ],
   "ssdp": [],
-  "version": "1.0.2",
+  "version": "1.1.0",
   "zeroconf": []
 }

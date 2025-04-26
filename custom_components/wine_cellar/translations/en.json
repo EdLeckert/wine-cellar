@@ -27,7 +27,11 @@
     },
     "get_inventory": {
       "name": "Get Inventory",
-      "description": "Get the inventory list."
+      "description": "Get the inventory list, including all bottles of each wine."
+    },
+    "get_distinct_inventory": {
+      "name": "Get Distinct Inventory",
+      "description": "Get the inventory list of unique wines and the bottle count of each."
     },
     "get_locations": {
       "name": "Get Locations",

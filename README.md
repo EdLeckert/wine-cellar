@@ -17,7 +17,8 @@ The `wine-cellar` implementation allows you to integrate your [Cellar Tracker](h
 - Action immediately refreshes inventory from Cellar Tracker.
 
 ## Disclaimer
-This is an unofficial integration of Cellar Tracker for Home Assistant. The developer and the contributors are not in any way affiliated with CellarTracker! LLC.
+This is an unofficial integration of Cellar Tracker for Home Assistant. The developer and the contributors are not in any way affiliated
+with CellarTracker! LLC.
 
 "CellarTracker!" is a trademark of CellarTracker! LLC
 
@@ -34,11 +35,13 @@ This is an unofficial integration of Cellar Tracker for Home Assistant. The deve
 ## Usage
 
 ### Sensor Entity
-A single sensor entity is provided for each linked CellarTracker account. This could be useful for a quick view of your total bottle count as well as a launch point to more detailed information, as shown here:
+A single sensor entity is provided for each linked CellarTracker account. This could be useful for a quick view of your total bottle count
+as well as a launch point to more detailed information, as shown here:
 
 <img src="/img/WineSensorEntity.png" alt="Wine Sensor Button" width="25%">
 
-This Tile Card provides the total bottle count, a link to a view with more information called `wine-inventory`, and an `icon_tap_action` to immediately refresh Home Assistant from the CellarTracker database.
+This Tile Card provides the total bottle count, a link to a view with more information called `wine-inventory`, and an `icon_tap_action`
+to immediately refresh Home Assistant from the CellarTracker database.
 
 ```
 - type: tile
@@ -54,14 +57,16 @@ This Tile Card provides the total bottle count, a link to a view with more infor
       entity_id: sensor.<yourmembername>_wine_inventory
 ```
 
-### Inventory List Action
-More detailed views of the inventory are best presented with the [flex-table-card](https://github.com/custom-cards/flex-table-card). The `flex-table-card` shows data in a tabular form, which works well for a wine database.
+### Inventory List Actions
+More detailed views of the inventory are best presented with the [flex-table-card](https://github.com/custom-cards/flex-table-card).
+The `flex-table-card` shows data in a tabular form, which works well for a wine database.
 
 Consider this list of wines as shown in a `flex-table-card`:
 
 <img src="/img/WineInventoryList.png" alt="Wine Inventory List" width="100%">
 
-The card definition for the above view demonstrates some advanced features of the card which can be used to mimic CellarTracker's display of icons. Notice the use of the `action` option to populate the table using the `wine_cellar.get_inventory` action.
+The card definition for the above view demonstrates some advanced features of the card which can be used to mimic CellarTracker's display of icons.
+Notice the use of the `action` option to populate the table using the `wine_cellar.get_inventory` action.
 
 ```
 type: custom:flex-table-card
@@ -153,6 +158,9 @@ css:
   tr:has(> td div.too-early): color:dimgray !important;
   tr:has(> td div.too-late): color:red !important;
 ```
+
+Alternatively, you can use the `wine_cellar.get_distinct_inventory` action to view a list of distinct wines in your inventory,
+along with a bottle count of each wine.
 
 ### Inventory Summary Actions
 

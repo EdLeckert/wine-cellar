@@ -6,6 +6,10 @@ get_inventory:
   target:
     entity:
       integration: wine_cellar
+get_distinct_inventory:
+  target:
+    entity:
+      integration: wine_cellar
 get_locations:
   target:
     entity:

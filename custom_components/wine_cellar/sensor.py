@@ -16,6 +16,7 @@ from .const import (
     DOMAIN,
     SCHEMA_SERVICE_GET_COUNTRIES,
     SCHEMA_SERVICE_GET_INVENTORY,
+    SCHEMA_SERVICE_GET_DISTINCT_INVENTORY,
     SCHEMA_SERVICE_GET_LOCATIONS,
     SCHEMA_SERVICE_GET_PRODUCERS,
     SCHEMA_SERVICE_GET_TYPES,
@@ -24,6 +25,7 @@ from .const import (
     SCHEMA_SERVICE_REFRESH_INVENTORY,
     SERVICE_GET_COUNTRIES,
     SERVICE_GET_INVENTORY,
+    SERVICE_GET_DISTINCT_INVENTORY,
     SERVICE_GET_LOCATIONS,
     SERVICE_GET_PRODUCERS,
     SERVICE_GET_TYPES,
@@ -59,6 +61,14 @@ async def async_setup_entry(
         SERVICE_GET_INVENTORY,
         SCHEMA_SERVICE_GET_INVENTORY,
         "_get_inventory",
+        supports_response=SupportsResponse.ONLY,
+    )
+
+    # This will call Entity._get_distinct_inventory
+    platform.async_register_entity_service(
+        SERVICE_GET_DISTINCT_INVENTORY,
+        SCHEMA_SERVICE_GET_DISTINCT_INVENTORY,
+        "_get_distinct_inventory",
         supports_response=SupportsResponse.ONLY,
     )
 
@@ -258,7 +268,7 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         return inventory
 
     def _inventory_group_summary(self, group) -> list[dict]:
-        """Build a list of dict objects for summary of inventory by country."""
+        """Build a list of dict objects for summary of inventory by various groups."""
         summary = []
         df = pd.DataFrame(self.coordinator.data)
         df[["Price","Valuation"]] = df[["Price","Valuation"]].apply(pd.to_numeric).round(0)
@@ -283,12 +293,68 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
 
         return summary
 
+    def _get_distinct_values(self, bottle: dict) -> dict:
+        """Return distinct wine values for a bottle in inventory."""
+        wine = {}
+        wine["iWine"] = bottle["iWine"]
+        wine["Size"] = bottle["Size"]
+        wine["Valuation"] = bottle["Valuation"]
+        wine["Vintage"] = bottle["Vintage"]
+        wine["Wine"] = bottle["Wine"]
+        wine["Locale"] = bottle["Locale"]
+        wine["Country"] = bottle["Country"]
+        wine["Region"] = bottle["Region"]
+        wine["SubRegion"] = bottle["SubRegion"]
+        wine["Appellation"] = bottle["Appellation"]
+        wine["Producer"] = bottle["Producer"]
+        wine["SortProducer"] = bottle["SortProducer"]
+        wine["Type"] = bottle["Type"]
+        wine["Color"] = bottle["Color"]
+        wine["Category"] = bottle["Category"]
+        wine["Varietal"] = bottle["Varietal"]
+        wine["MasterVarietal"] = bottle["MasterVarietal"]
+        wine["Designation"] = bottle["Designation"]
+        wine["Vineyard"] = bottle["Vineyard"]
+        wine["BeginConsume"] = bottle["BeginConsume"]
+        wine["EndConsume"] = bottle["EndConsume"]
+        wine["PurchasedCommunity"] = bottle["PurchasedCommunity"]
+        wine["QuantityCommunity"] = bottle["QuantityCommunity"]
+        wine["PendingCommunity"] = bottle["PendingCommunity"]
+        wine["ConsumedCommunity"] = bottle["ConsumedCommunity"]
+        return wine
+
+    def _inventory_group_distinct(self) -> list[dict]:
+        """Build a list of dict objects for summary of inventory by distinct wines."""
+        idList = []
+        wineList = []
+        groupby = "iWine"
+
+        # Get list of wine IDs.
+        for item in self.coordinator.data:
+            idList.append(item[groupby])
+
+        # Count duplicates (multiple bottles of a wine)
+        counts = dict()
+        for i in idList:
+            counts[i] = counts.get(i, 0) + 1
+
+        # Get values identical over all bottles of a wine and add bottle Count value
+        for key, value in counts.items():
+            element = find_first_matching_element(self.coordinator.data, groupby, key)
+            distinct_values = self._get_distinct_values(element)
+            distinct_values['Count'] = value
+            wineList.append(distinct_values)
+
+        return wineList
+
     async def _get_countries(self):
         return { "countries": self._inventory_group_summary("Country") }
 
     async def _get_inventory(self):
-       # Update the data
         return { "inventory": self._inventory_list() }
+
+    async def _get_distinct_inventory(self):
+        return { "inventory": self._inventory_group_distinct() }
 
     async def _get_locations(self):
         return { "locations": self._inventory_group_summary("Location") }
@@ -306,6 +372,22 @@ class WineInventorySensor(CoordinatorEntity, SensorEntity):
         return { "vintages": self._inventory_group_summary("Vintage") }
 
     async def _refresh_inventory(self):
-
        # Update the data
         await self.coordinator.async_request_refresh()
+
+def find_first_matching_element(list_of_dicts, key, value):
+    """
+    Finds the first dictionary in a list where a specified key has a certain value.
+
+    Args:
+        list_of_dicts: A list of dictionaries.
+        key: The key to search for within each dictionary.
+        value: The value that the key should match.
+
+    Returns:
+        The first dictionary that matches the criteria, or None if no match is found.
+    """
+    for dictionary in list_of_dicts:
+        if key in dictionary and dictionary[key] == value:
+            return dictionary
+    return None

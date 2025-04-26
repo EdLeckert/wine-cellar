@@ -19,5 +19,43 @@
     "abort": {
       "already_configured": "Device is already configured"
     }
+  },
+  "services": {
+    "get_countries": {
+      "name": "Get Countries",
+      "description": "Get a summary of wine inventory by country."
+    },
+    "get_inventory": {
+      "name": "Get Inventory",
+      "description": "Get the inventory list, including all bottles of each wine."
+    },
+    "get_distinct_inventory": {
+      "name": "Get Distinct Inventory",
+      "description": "Get the inventory list of unique wines and the bottle count of each."
+    },
+    "get_locations": {
+      "name": "Get Locations",
+      "description": "Get a summary of wine inventory by location."
+    },
+    "get_producers": {
+      "name": "Get Producers",
+      "description": "Get a summary of wine inventory by producer."
+    },
+    "get_types": {
+      "name": "Get Types",
+      "description": "Get a summary of wine inventory by type."
+    },
+    "get_varietals": {
+      "name": "Get Varietals",
+      "description": "Get a summary of wine inventory by varietal."
+    },
+    "get_vintages": {
+      "name": "Get Vintages",
+      "description": "Get a summary of wine inventory by vintage."
+    },
+    "refresh_inventory": {
+      "name": "Refresh Inventory",
+      "description": "Forces an immediate refresh of the inventory list from the Cellar Tracker API."
+    }
   }
 }
