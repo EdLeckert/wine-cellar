@@ -9,8 +9,9 @@
   "documentation": "https://github.com/EdLeckert/wine-cellar",
   "homekit": {},
   "iot_class": "cloud_polling",
+  "issue_tracker": "https://github.com/EdLeckert/wine-cellar/issues",
   "requirements": [ "cellartracker==1.1.1" ],
   "ssdp": [],
-  "version": "1.1.0",
+  "version": "1.1.1",
   "zeroconf": []
 }
