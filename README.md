@@ -58,7 +58,14 @@ to immediately refresh Home Assistant from the CellarTracker database.
 ```
 
 ### Inventory List Actions
-More detailed views of the inventory are best presented with the [flex-table-card](https://github.com/custom-cards/flex-table-card).
+The current inventory of your collection can be accessed using the `wine_cellar.get_inventory` Action. This returns the same data
+that is provided by the [data export feature](https://support.cellartracker.com/article/29-exporting-data) of CellarTracker. You can
+view the available fields by calling the Action from `Developer tools` within Home Assistant.
+
+Note that some fields are not populated from Free accounts, including the `Community wine ratings`, which is otherwise available to
+these accounts. This is a limitation of CellarTracker.
+
+Detailed views of the inventory are best presented with the [flex-table-card](https://github.com/custom-cards/flex-table-card).
 The `flex-table-card` shows data in a tabular form, which works well for a wine database.
 
 Consider this list of wines as shown in a `flex-table-card`:
